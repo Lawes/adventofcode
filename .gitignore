@@ -1,10 +1,13 @@
 .vscode/
 *.pyc
+*.exe
 
 /*
 !pycommon/
+!2015/
 !2022/
 !2021/
+!common/
 !.gitignore
 !README.md
 
