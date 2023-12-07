@@ -2,14 +2,6 @@
 *.pyc
 *.exe
 
-/*
-!pycommon/
-!2015/
-!2022/
-!2021/
-!2023/
-!common/
-!.gitignore
-!README.md
-
+2016/
+aoc_session
 input
