@@ -15,5 +15,9 @@ def nolog():
     logger.disabled = True
 
 
+def is_log_enable():
+    return not logger.disabled
+
+
 def debug(*args):
     logger.info(*args)
