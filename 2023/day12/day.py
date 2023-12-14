@@ -1,5 +1,6 @@
 import pycommon as M
 import itertools
+from functools import lru_cache
 
 
 def load_input(filename):
@@ -43,16 +44,7 @@ def search_choices2(spring, groups):
     return count
 
 
-_cache = {}
-def cache_search_choices3(spring, groups, ingrp=False):
-    key = (spring, tuple(groups), ingrp)
-    if key in _cache:
-        return _cache[key]
-    res = search_choices3(spring, groups, ingrp=ingrp)
-    _cache[key] = res
-    return res
-
-
+@lru_cache(maxsize=2**20)
 def search_choices3(spring, groups, ingrp=False):
     M.debug('check %s, %s, %s', spring, groups, ingrp)
     if not groups:
@@ -75,7 +67,7 @@ def search_choices3(spring, groups, ingrp=False):
             g = groups[0] - 1
             if g == 0:
                 if len(spring) > 1 and spring[1] in '.?':
-                    return cache_search_choices3(spring[2:], groups[1:], False)
+                    return search_choices3(spring[2:], groups[1:], False)
                 elif len(groups) > 1:
                     M.debug('no')
                     return 0
@@ -83,21 +75,21 @@ def search_choices3(spring, groups, ingrp=False):
                     M.debug('ok2' if len(spring) == 1 else 'not')
                     return int(len(spring) == 1)
             else:
-                return cache_search_choices3(spring[1:], [g] + groups[1:], True)
+                return search_choices3(spring[1:], (g,) + groups[1:], True)
         elif spring[0] == '?':
             g = groups[0]
             if g > 0:
-                return cache_search_choices3('#' + spring[1:], groups, True)
+                return search_choices3('#' + spring[1:], groups, True)
             else:
-                return cache_search_choices3(spring[1:], groups, False)
+                return search_choices3(spring[1:], groups, False)
     else:
         if spring[0] == '.':
-            return cache_search_choices3(spring.lstrip('.'), groups, False)
+            return search_choices3(spring.lstrip('.'), groups, False)
         elif spring[0] == '#':
-            return cache_search_choices3(spring, groups, True)
+            return search_choices3(spring, groups, True)
         else:
-            c1 = cache_search_choices3(spring[1:].lstrip('.'), groups, False)
-            c2 = cache_search_choices3('#' + spring[1:], groups, False)
+            c1 = search_choices3(spring[1:].lstrip('.'), groups, False)
+            c2 = search_choices3('#' + spring[1:], groups, False)
             return c1 + c2
 
 
@@ -115,13 +107,13 @@ def test():
         print(
             row[0],
             search_choices2(row[0], row[1]),
-            search_choices3(row[0], list(row[1])))
+            search_choices3(row[0], row[1]))
 
     M.log()
     spring = '?###????????'
     ref_count = (3, 2, 1)
     print('*study', spring, ref_count)
-    print(search_choices3(row[0], list(row[1])))
+    print(search_choices3(row[0], row[1]))
 
 
 @M.timeperf
@@ -130,7 +122,7 @@ def part1():
     data = load_input('input')
     total = 0
     for spring, ref_count in data:
-        total += (count := search_choices3(spring, list(ref_count)))
+        total += (count := search_choices3(spring, ref_count))
         M.debug("%s = %s", spring, count)
     print('part1', total)
 
@@ -140,16 +132,22 @@ def part2():
     M.nolog()
     data = load_input('input')
     total = 0
+    pcache = search_choices3.cache_info()
     for spring, ref_count in data:
         s = f'{spring}?{spring}?{spring}?{spring}?{spring}'
         r = ref_count + ref_count + ref_count + ref_count + ref_count
-        t2 = cache_search_choices3(s, list(r))
+        t2 = search_choices3(s, r)
         total += t2
-        print(spring, '=', t2)
+        cache = search_choices3.cache_info()
+        cache_call = (cache.hits - pcache.hits + cache.misses - pcache.misses)
+        cache_ratio = 100 * (cache.hits - pcache.hits) / cache_call
+        pcache = cache
+
+        print(spring, '  ', ref_count, '=', t2, f', cache_usage {int(cache_ratio)}% of {cache_call} calls,', 'cache size', cache.currsize)
     print('part2', total)
 
 
 if __name__ == '__main__':
-    test()
+    # test()
     part1()
     part2()
