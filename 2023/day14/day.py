@@ -97,7 +97,7 @@ def part1():
 
 @M.timeperf
 def part2():
-    M.nolog()
+    # M.nolog()
     rocks, sands, size = load_input('input')
 
     tiltcycle = [
@@ -112,14 +112,16 @@ def part2():
     while cycle < 1000000000:
         for tiltargs in tiltcycle:
             sands = tilt(rocks, sands, size, **tiltargs)
-        M.debug('cycle %s:\n%s', cycle, display(rocks, sands))
+        # M.debug('cycle %s:\n%s', cycle, display(rocks, sands))
 
         cycle += 1
         if sands in cache:
             prevcycle = cache[sands]
             if cycle + cycle - prevcycle < 1000000000:
-                M.debug('current %s, found %s, jump to %s', cycle, prevcycle, cycle + cycle - prevcycle)
-                cycle += cycle - prevcycle
+                ncycle = (1000000000 - cycle) // (cycle - prevcycle)
+                delta = (cycle - prevcycle) * ncycle
+                M.debug('current %s, found %s, jump to %s', cycle, prevcycle, cycle + delta)
+                cycle += delta
                 continue
 
         cache[sands] = cycle
