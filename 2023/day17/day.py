@@ -1,16 +1,6 @@
 import pycommon as M
 
 
-def load_input(filename):
-    grid = {}
-    with open(filename, 'r') as f:
-        content = f.read().splitlines()
-        for iy, line in enumerate(content):
-            for ix, c in enumerate(line):
-                grid[(ix, iy)] = int(c)
-    return grid
-
-
 class Path(M.AocDijkstra):
     def __init__(self, grid):
         self.G = grid
@@ -44,7 +34,6 @@ class Path(M.AocDijkstra):
 
 class Path2(M.AocDijkstra):
     def __init__(self, grid):
-        super().__init__()
         self.G = grid
         x, y = list(zip(*list(grid.keys())))
         self.end = max(x), max(y)
@@ -98,7 +87,7 @@ def display(points):
 @M.timeperf
 def test():
     M.nolog()
-    grid = load_input('input_test')
+    grid, _, _ = M.grid_file('input_test', {str(v): v for v in range(10)})
 
     print('* normal')
     p = Path(grid)
@@ -120,7 +109,7 @@ def test():
 @M.timeperf
 def part1():
     M.nolog()
-    grid = load_input('input')
+    grid, _, _ = M.grid_file('input', {str(v): v for v in range(10)})
 
     p = Path(grid)
     print(p.end)
@@ -131,7 +120,7 @@ def part1():
 @M.timeperf
 def part2():
     M.nolog()
-    grid = load_input('input')
+    grid, _, _ = M.grid_file('input', {str(v): v for v in range(10)})
 
     p = Path2(grid)
     cost, end_state = p.search((0, 0, (0, 0), 1))
