@@ -9,8 +9,7 @@ class AocBfs:
     def is_end(self, state):
     def make_key(self, state):
     """
-    def __init__(self):
-        self.stop_after = None
+    stop_after = None
 
     def set_stop_after(self, i):
         self.stop_after = i
@@ -25,10 +24,10 @@ class AocBfs:
         return state
 
     def next(self):
-        while self.queue:
-            imove, state = self.queue.popleft()
+        while self.lopen:
+            imove, state = self.lopen.popleft()
             debug('')
-            debug('BFS #queue %s, pickup %s %s', len(self.queue), imove, state)
+            debug('BFS #queue %s, pickup %s %s', len(self.lopen), imove, state)
             if self.is_end(state):
                 return imove, state
 
@@ -47,7 +46,7 @@ class AocBfs:
                 if key in self.cache:
                     debug('BFS key in cache')
                     continue
-                self.queue.append((smoves, s))
+                self.lopen.append((smoves, s))
                 self.cache.add(key)
             if self.stop_after is not None and self.stop_after == self.count_deque:
                 break
@@ -55,7 +54,7 @@ class AocBfs:
 
     def search(self, *states0):
         self.count_deque = 0
-        self.queue = deque([(0, s) for s in states0])
-        self.cache = set()
+        self.lopen = deque([(0, s) for s in states0])
+        self.cache = set([self.make_key(s) for s in states0])
 
         return self.next()
