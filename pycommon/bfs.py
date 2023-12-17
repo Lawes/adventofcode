@@ -16,44 +16,46 @@ class AocBfs:
         self.stop_after = i
 
     def get_voisins(self, state):
-        raise NotImplementedError()
+        raise NotImplementedError('get_voisins')
 
     def is_end(self, state):
-        raise NotImplementedError()
+        raise NotImplementedError('is_end')
 
     def make_key(self, state):
-        raise NotImplementedError()
+        return state
 
-    def search(self, *states0):
-        count_deque = 0
-        step = 0
+    def next(self):
+        while self.queue:
+            imove, state = self.queue.popleft()
+            debug('')
+            debug('BFS #queue %s, pickup %s %s', len(self.queue), imove, state)
+            if self.is_end(state):
+                return imove, state
 
-        queue = deque([(step, s) for s in states0])
-        cache = set()
-
-        while queue:
-            imove, state = queue.popleft()
-            debug('BFS pickup %s, %s', imove, state)
             choices = self.get_voisins(state)
             if is_log_enable:
                 debug('BFS get_voisins:')
-                for s in choices:
+                for s, c in choices:
                     debug('    - %s', s)
 
-            count_deque += 1
-            imove += 1
+            self.count_deque += 1
 
-            for s in choices:
-                if self.is_end(s):
-                    return imove, s
+            for s, c in choices:
+                smoves = imove + c
                 key = self.make_key(s)
                 debug('BFS make_key %s <- %s', key, s)
-                if key in cache:
+                if key in self.cache:
                     debug('BFS key in cache')
                     continue
-                queue.append((imove, s))
-                cache.add(key)
-            if self.stop_after is not None and self.stop_after == count_deque:
+                self.queue.append((smoves, s))
+                self.cache.add(key)
+            if self.stop_after is not None and self.stop_after == self.count_deque:
                 break
-            debug('BFS #queue %s', len(queue))
-        return -1
+        return None
+
+    def search(self, *states0):
+        self.count_deque = 0
+        self.queue = deque([(0, s) for s in states0])
+        self.cache = set()
+
+        return self.next()
