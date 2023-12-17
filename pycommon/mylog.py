@@ -1,7 +1,7 @@
 import sys
 import logging
 
-__all__ = ['nolog', 'log', 'debug']
+__all__ = ['nolog', 'log', 'debug', 'is_log_enable']
 
 logger = logging.getLogger('aoc')
 
