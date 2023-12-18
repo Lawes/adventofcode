@@ -15,7 +15,7 @@ class AocDijkstra:
         """
         raise NotImplementedError('get_voisins')
 
-    def is_end(self, state):
+    def is_end(self, state, cost=None):
         return False
 
     def make_key(self, state):
@@ -26,12 +26,12 @@ class AocDijkstra:
         self.lopen = [(cost0, state0)]
         self.cost = {self.make_key(state0): (cost0, None)}
 
-        self.maxcost = maxcost
+        self._maxcost = maxcost
 
         return self.next()
 
     def next(self):
-        emptystate = (self.maxcost, None)
+        emptystate = (self._maxcost, None)
         while self.lopen:
             debug('')
             cost, newstate = heapq.heappop(self.lopen)
@@ -43,7 +43,7 @@ class AocDijkstra:
                 debug('alreaydy in close')
                 continue
 
-            if self.is_end(newstate):
+            if self.is_end(newstate, cost=cost):
                 debug('DIJKSTRA end')
                 return cost, newstate
 
@@ -52,7 +52,7 @@ class AocDijkstra:
             choices = self.get_voisins(newstate)
             debug('DIJKSTRA get_voisins:')
             for s, c in choices:
-                debug('    - %s, corst %s', s, c)
+                debug('    - %s, cost %s', s, c)
                 ks = self.make_key(s)
                 if ks in self.lclose:
                     continue

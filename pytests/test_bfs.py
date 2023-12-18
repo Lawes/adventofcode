@@ -31,12 +31,27 @@ class TestBfs(unittest.TestCase):
             def get_voisins(self, state):
                 return [(n, 1) for n in self.graph.get(state, [])]
 
-            def is_end(self, state):
+            def is_end(self, state, **kwargs):
                 return state == 'H'
 
         algo = Bfs(self.graph)
         self.assertEqual(algo.search('A'), (3, 'H'))
         self.assertEqual(algo.search('C'), (4, 'H'))
+
+    def test_search_limitdepth(self):
+        class Bfs(M.AocBfs):
+            def __init__(self, graph):
+                self.graph = graph
+
+            def get_voisins(self, state):
+                return [(n, 1) for n in self.graph.get(state, [])]
+
+            def is_end(self, state, cost):
+                return cost >= 1
+
+        algo = Bfs(self.graph)
+        algo.search('A')
+        self.assertEqual(algo.lclose, {'A', 'B', 'C', 'D'})
 
     def test_next(self):
         class Bfs(M.AocBfs):
@@ -46,7 +61,7 @@ class TestBfs(unittest.TestCase):
             def get_voisins(self, state):
                 return [(n, 1) for n in self.graph.get(state, [])]
 
-            def is_end(self, state):
+            def is_end(self, state, **kwargs):
                 return state in 'DF'
 
         algo = Bfs(self.graph)

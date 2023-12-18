@@ -7,7 +7,7 @@ class Path(M.AocDijkstra):
         x, y = list(zip(*list(grid.keys())))
         self.end = max(x), max(y)
 
-    def is_end(self, state):
+    def is_end(self, state, **kwargs):
         return (state[0], state[1]) == self.end
 
     def get_voisins(self, state):
@@ -38,7 +38,7 @@ class Path2(M.AocDijkstra):
         x, y = list(zip(*list(grid.keys())))
         self.end = max(x), max(y)
 
-    def is_end(self, state):
+    def is_end(self, state, **kwargs):
         return (state[0], state[1]) == self.end and state[3] >= 4
 
     def get_voisins(self, state):
